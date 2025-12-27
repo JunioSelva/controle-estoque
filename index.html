@@ -14,10 +14,9 @@
       type="text"
       id="busca"
       placeholder="Buscar produto..."
-      onkeyup="aplicarFiltros()"
     >
 
-    <select id="filtro-categoria" onchange="aplicarFiltros()">
+    <select id="filtro-categoria">
       <option value="">Todas categorias</option>
       <option value="Refrigerante">Refrigerante</option>
       <option value="Cerveja">Cerveja</option>
@@ -32,14 +31,18 @@
       <input
         type="checkbox"
         id="filtro-falta"
-        onchange="aplicarFiltros()"
       >
       Mostrar só o que falta
     </label>
   </div>
 
-  <div id="lista-produtos"></div>
- <script src="produtos.js"></script>
-  <script type="module" src="script.js"></script> 
+  <div id="lista-produtos">Carregando sistema...</div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <script src="produtos.js"></script>
+
+  <script src="script.js"></script>
 </body>
 </html>
