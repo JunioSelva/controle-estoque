@@ -54,11 +54,11 @@ window.produtos = [
 
 // Cervejas
 { nome: "Heineken 600ml", categoria: "Cerveja" },
-{ nome: "Heineken KS", categoria: "Cerveja" },
+{ nome: "Heineken Long Neck", categoria: "Cerveja" },
 { nome: "Heineken Lata Normal", categoria: "Cerveja" },
 { nome: "Heineken Lata Zero", categoria: "Cerveja" },
 { nome: "Amstel 600ml", categoria: "Cerveja" },
-{ nome: "Amstel KS", categoria: "Cerveja" },
+{ nome: "Amstel Long Neck", categoria: "Cerveja" },
 { nome: "Amstel Ultra", categoria: "Cerveja" },
 { nome: "Amstel Lata Normal", categoria: "Cerveja" },
 { nome: "Amstel Lata Zero", categoria: "Cerveja" },
@@ -117,9 +117,9 @@ window.produtos = [
 { nome: "Saideira de Minas", categoria: "Destilado" },
 { nome: "Orizona", categoria: "Destilado" },
 { nome: "Smirnoff", categoria: "Destilado" },
-{ nome: "Tanqueray", categoria: "Destilado" },
-{ nome: "Gordon's", categoria: "Destilado" },
-{ nome: "Intencion", categoria: "Destilado" },
+{ nome: "Tanqueray", categoria: "Ice/Gin" },
+{ nome: "Gordon's", categoria: "Ice/Gin" },
+{ nome: "Intencion", categoria: "Ice/Gin" },
 { nome: "RMS", categoria: "Destilado" },
 { nome: "Aperol", categoria: "Destilado" },
 { nome: "Campari", categoria: "Destilado" },
@@ -213,4 +213,5 @@ window.produtos = [
 { nome: "Bombril", categoria: "Limpeza" },
 { nome: "Esponja", categoria: "Limpeza" },
 { nome: "Álcool", categoria: "Limpeza" }
+
 ];
