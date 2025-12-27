@@ -13,24 +13,17 @@ const firebaseConfig = {
 try {
   firebase.initializeApp(firebaseConfig);
 } catch (e) {
-  console.error("Firebase já inicializado ou erro:", e);
+  console.error("Firebase erro:", e);
 }
 const db = firebase.database();
 
-// Elementos da Tela
-const container = document.getElementById('lista-produtos');
-const inputBusca = document.getElementById('busca');
-const selectCategoria = document.getElementById('filtro-categoria');
-const checkFalta = document.getElementById('filtro-falta');
-
+// Variáveis Globais
 let listaGlobal = [];
-let timeoutBusca = null; // Para controlar a lentidão
+let timeoutBusca = null;
 
-// --- FUNÇÕES AUXILIARES ---
-
-// Remove acentos para facilitar a busca (Ex: "Limão" vira "Limao")
+// Funções Auxiliares
 function normalizarTexto(texto) {
-  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
 function gerarId(nome) {
@@ -39,18 +32,33 @@ function gerarId(nome) {
 
 // --- INICIALIZAÇÃO ---
 window.onload = function() {
-  // 1. Carrega dados locais imediatamente
+  // 1. Configura os elementos da tela
+  const inputBusca = document.getElementById('busca');
+  const selectCategoria = document.getElementById('filtro-categoria');
+  const checkFalta = document.getElementById('filtro-falta');
+
+  // 2. Garante que os eventos funcionem (Aqui estava o possível erro)
+  if (inputBusca) {
+    inputBusca.onkeyup = function() {
+      clearTimeout(timeoutBusca);
+      timeoutBusca = setTimeout(aplicarFiltros, 300);
+    };
+  }
+  if (selectCategoria) selectCategoria.onchange = aplicarFiltros;
+  if (checkFalta) checkFalta.onchange = aplicarFiltros;
+
+  // 3. Carrega dados locais
   if (window.produtos) {
     listaGlobal = window.produtos.map(p => ({
       ...p,
       falta: false, data: "", qtdAtual: "", qtdRepor: ""
     }));
-    renderizar(listaGlobal); // Desenha a primeira vez
+    renderizar(listaGlobal);
   } else {
-    container.innerHTML = "<div style='padding:20px; text-align:center'>Erro: Lista de produtos não encontrada.</div>";
+    document.getElementById('lista-produtos').innerHTML = "Erro: window.produtos não encontrado.";
   }
 
-  // 2. Conecta no Firebase
+  // 4. Conecta na Nuvem
   iniciarConexaoNuvem();
 };
 
@@ -72,24 +80,24 @@ function iniciarConexaoNuvem() {
         };
       });
       
-      // Só atualiza a tela se o usuário NÃO estiver digitando na busca no momento
-      if (document.activeElement !== inputBusca) {
+      // Só atualiza se o usuário não estiver digitando
+      if (document.activeElement !== document.getElementById('busca')) {
         aplicarFiltros(); 
       }
     }
   });
 }
 
-// --- RENDERIZAÇÃO OTIMIZADA ---
+// --- RENDERIZAÇÃO ---
 function renderizar(lista) {
+  const container = document.getElementById('lista-produtos');
   container.innerHTML = '';
 
   if (!lista || lista.length === 0) {
-    container.innerHTML = '<div style="padding:20px; color:#666; text-align:center;">Nenhum produto encontrado.</div>';
+    container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">Nenhum produto encontrado nesta categoria.</div>';
     return;
   }
 
-  // Fragmento para evitar redesenhar a tela item por item (Mais rápido)
   const fragmento = document.createDocumentFragment();
 
   lista.forEach((produto) => {
@@ -157,29 +165,28 @@ window.salvarFalta = function(nomeProduto, isChecked) {
   db.ref('estoque/' + id + '/falta').set(isChecked);
 };
 
-// --- FILTROS INTELIGENTES ---
+// --- FILTRO (A Lógica Corrigida) ---
 window.aplicarFiltros = function() {
-  const termo = normalizarTexto(inputBusca.value); // Usa a busca sem acentos
-  const categoria = selectCategoria.value;
+  const inputBusca = document.getElementById('busca');
+  const selectCategoria = document.getElementById('filtro-categoria');
+  const checkFalta = document.getElementById('filtro-falta');
+
+  const termo = normalizarTexto(inputBusca.value);
+  const categoriaSelecionada = selectCategoria.value.trim(); // Remove espaços extras
   const soFalta = checkFalta.checked;
 
   const filtrados = listaGlobal.filter(p => {
     const nomeNormalizado = normalizarTexto(p.nome);
     
+    // Compara a categoria do arquivo com a selecionada (Ignora espaços)
+    const categoriaProduto = p.categoria.trim();
+    
     const matchNome = nomeNormalizado.includes(termo);
-    const matchCat = categoria === "" || p.categoria === categoria;
+    const matchCat = categoriaSelecionada === "" || categoriaProduto === categoriaSelecionada;
     const matchFalta = !soFalta || (soFalta && p.falta);
     
     return matchNome && matchCat && matchFalta;
   });
 
   renderizar(filtrados);
-};
-
-// --- EVENTOS ---
-
-// Busca com "Debounce" (Espera parar de digitar para filtrar)
-inputBusca.onkeyup = function() {
-  clearTimeout(timeoutBusca);
-  timeoutBusca = setTimeout(window.aplicarFiltros, 300); // Espera 300ms
 };
