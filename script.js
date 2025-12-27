@@ -1,3 +1,19 @@
+window.onerror = function(message, source, lineno, colno, error) {
+  const container = document.getElementById('lista-produtos');
+  if (container) {
+    container.innerHTML = `
+      <div style="background:red; color:white; padding:15px; border-radius:5px;">
+        <h3>Ocorreu um erro!</h3>
+        <p><b>Mensagem:</b> ${message}</p>
+        <p><b>Linha:</b> ${lineno}</p>
+        <p>Tire um print e mande para corrigir.</p>
+      </div>
+    `;
+  }
+  return false;
+};
+
+// --- CONFIGURAÇÃO FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyBgBx-f_4FN7_nxbG4MGiBqEsZJwF8nJco",
   authDomain: "estoquebardonino.firebaseapp.com",
@@ -11,11 +27,16 @@ const firebaseConfig = {
 
 // Inicializa Firebase
 try {
-  firebase.initializeApp(firebaseConfig);
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    window.db = firebase.database();
+  } else {
+    throw new Error("Biblioteca Firebase não carregada.");
+  }
 } catch (e) {
-  console.error("Firebase erro:", e);
+  console.error(e);
+  // O onerror lá em cima vai pegar isso se der erro
 }
-const db = firebase.database();
 
 // Variáveis Globais
 let listaGlobal = [];
@@ -23,6 +44,7 @@ let timeoutBusca = null;
 
 // Funções Auxiliares
 function normalizarTexto(texto) {
+  if (!texto) return "";
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
 }
 
@@ -30,19 +52,22 @@ function gerarId(nome) {
   return nome.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-// --- NOVA FUNÇÃO: MÁSCARA DE DATA ---
-window.mascaraData = function(input) {
-  let v = input.value.replace(/\D/g, ""); // Remove tudo que não é número
+// --- MÁSCARA DE DATA (Função Global) ---
+window.aplicarMascaraData = function(input) {
+  // Remove tudo que não é número
+  let valor = input.value.replace(/\D/g, "");
   
-  if (v.length > 2) {
-    v = v.replace(/^(\d{2})(\d)/, "$1/$2"); // Coloca a barra depois do 2º número
+  // Adiciona a barra
+  if (valor.length > 2) {
+    valor = valor.replace(/^(\d{2})(\d)/, "$1/$2");
   }
   
-  if (v.length > 5) {
-    v = v.substring(0, 5); // Limita a 5 caracteres (dd/mm)
+  // Limita tamanho
+  if (valor.length > 5) {
+    valor = valor.substring(0, 5);
   }
   
-  input.value = v;
+  input.value = valor;
 };
 
 // --- INICIALIZAÇÃO ---
@@ -50,7 +75,9 @@ window.onload = function() {
   const inputBusca = document.getElementById('busca');
   const selectCategoria = document.getElementById('filtro-categoria');
   const checkFalta = document.getElementById('filtro-falta');
+  const container = document.getElementById('lista-produtos');
 
+  // Configura Eventos de Filtro
   if (inputBusca) {
     inputBusca.onkeyup = function() {
       clearTimeout(timeoutBusca);
@@ -60,21 +87,25 @@ window.onload = function() {
   if (selectCategoria) selectCategoria.onchange = aplicarFiltros;
   if (checkFalta) checkFalta.onchange = aplicarFiltros;
 
-  if (window.produtos) {
+  // Carrega Lista Local
+  if (window.produtos && window.produtos.length > 0) {
     listaGlobal = window.produtos.map(p => ({
       ...p,
       falta: false, data: "", qtdAtual: "", qtdRepor: ""
     }));
     renderizar(listaGlobal);
   } else {
-    document.getElementById('lista-produtos').innerHTML = "Erro: window.produtos não encontrado.";
+    container.innerHTML = "<div style='padding:20px; text-align:center'>Erro: Lista de produtos vazia ou não encontrada no arquivo produtos.js</div>";
   }
 
+  // Conecta na Nuvem
   iniciarConexaoNuvem();
 };
 
 function iniciarConexaoNuvem() {
-  db.ref('estoque').on('value', (snapshot) => {
+  if (!window.db) return;
+
+  window.db.ref('estoque').on('value', (snapshot) => {
     const dadosNuvem = snapshot.val() || {};
     
     if (window.produtos) {
@@ -91,6 +122,7 @@ function iniciarConexaoNuvem() {
         };
       });
       
+      // Só atualiza se não estiver buscando/digitando
       if (document.activeElement !== document.getElementById('busca')) {
         aplicarFiltros(); 
       }
@@ -114,6 +146,7 @@ function renderizar(lista) {
     const div = document.createElement('div');
     div.className = 'produto';
     
+    // Estilo Falta
     if (produto.falta) {
       div.style.borderLeftColor = "red";
       div.style.backgroundColor = "#fff5f5";
@@ -131,22 +164,22 @@ function renderizar(lista) {
       <div class="controles-estoque">
         <div class="input-group">
           <label>Data</label>
-          <input type="text" class="input-pequeno" placeholder="dd/mm" maxlength="5"
+          <input type="tel" class="input-pequeno" placeholder="dd/mm" maxlength="5"
             value="${produto.data}" 
-            oninput="mascaraData(this)"
+            oninput="aplicarMascaraData(this)"
             onchange="salvarDado('${produto.nome}', 'data', this.value)">
         </div>
 
         <div class="input-group">
           <label>Qtd Atual</label>
-          <input type="number" class="input-pequeno" placeholder="0" 
+          <input type="tel" class="input-pequeno" placeholder="0" 
             value="${produto.qtdAtual}" 
             onchange="salvarDado('${produto.nome}', 'qtdAtual', this.value)">
         </div>
 
         <div class="input-group">
           <label>Repor</label>
-          <input type="number" class="input-pequeno" placeholder="0" 
+          <input type="tel" class="input-pequeno" placeholder="0" 
             value="${produto.qtdRepor}" 
             onchange="salvarDado('${produto.nome}', 'qtdRepor', this.value)">
         </div>
@@ -168,12 +201,12 @@ function renderizar(lista) {
 // --- SALVAMENTO ---
 window.salvarDado = function(nomeProduto, campo, valor) {
   const id = gerarId(nomeProduto);
-  db.ref('estoque/' + id + '/' + campo).set(valor);
+  if(window.db) window.db.ref('estoque/' + id + '/' + campo).set(valor);
 };
 
 window.salvarFalta = function(nomeProduto, isChecked) {
   const id = gerarId(nomeProduto);
-  db.ref('estoque/' + id + '/falta').set(isChecked);
+  if(window.db) window.db.ref('estoque/' + id + '/falta').set(isChecked);
 };
 
 // --- FILTRO ---
@@ -196,3 +229,6 @@ window.aplicarFiltros = function() {
     
     return matchNome && matchCat && matchFalta;
   });
+
+  renderizar(filtrados);
+};
