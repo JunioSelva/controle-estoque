@@ -1,8 +1,22 @@
+Baseado no seu print (Uncaught SyntaxError: Unexpected end of input), o erro é simples: o código ficou incompleto na hora de copiar ou salvar.
+
+Esse erro significa literalmente: "O navegador estava lendo o código e o arquivo acabou do nada, sendo que eu esperava um fechamento de chave } ou parênteses )".
+
+Isso geralmente acontece quando falta copiar a última linha do arquivo.
+
+Como resolver agora
+Vou te mandar o código completo do script.js novamente. Copie TUDO, até a última chave lá embaixo. Substitua o arquivo inteiro.
+
+Arquivo script.js Corrigido:
+
+JavaScript
+
+// --- SISTEMA DE DIAGNÓSTICO DE ERROS (PARA MOBILE) ---
 window.onerror = function(message, source, lineno, colno, error) {
   const container = document.getElementById('lista-produtos');
   if (container) {
     container.innerHTML = `
-      <div style="background:red; color:white; padding:15px; border-radius:5px;">
+      <div style="background:red; color:white; padding:15px; border-radius:5px; margin: 20px;">
         <h3>Ocorreu um erro!</h3>
         <p><b>Mensagem:</b> ${message}</p>
         <p><b>Linha:</b> ${lineno}</p>
@@ -31,11 +45,10 @@ try {
     firebase.initializeApp(firebaseConfig);
     window.db = firebase.database();
   } else {
-    throw new Error("Biblioteca Firebase não carregada.");
+    console.warn("Firebase não carregado ainda.");
   }
 } catch (e) {
   console.error(e);
-  // O onerror lá em cima vai pegar isso se der erro
 }
 
 // Variáveis Globais
@@ -54,15 +67,12 @@ function gerarId(nome) {
 
 // --- MÁSCARA DE DATA (Função Global) ---
 window.aplicarMascaraData = function(input) {
-  // Remove tudo que não é número
   let valor = input.value.replace(/\D/g, "");
   
-  // Adiciona a barra
   if (valor.length > 2) {
     valor = valor.replace(/^(\d{2})(\d)/, "$1/$2");
   }
   
-  // Limita tamanho
   if (valor.length > 5) {
     valor = valor.substring(0, 5);
   }
@@ -95,7 +105,7 @@ window.onload = function() {
     }));
     renderizar(listaGlobal);
   } else {
-    container.innerHTML = "<div style='padding:20px; text-align:center'>Erro: Lista de produtos vazia ou não encontrada no arquivo produtos.js</div>";
+    if(container) container.innerHTML = "<div style='padding:20px; text-align:center'>Erro: Lista de produtos vazia ou não encontrada no arquivo produtos.js</div>";
   }
 
   // Conecta na Nuvem
@@ -123,7 +133,8 @@ function iniciarConexaoNuvem() {
       });
       
       // Só atualiza se não estiver buscando/digitando
-      if (document.activeElement !== document.getElementById('busca')) {
+      const buscaElem = document.getElementById('busca');
+      if (document.activeElement !== buscaElem) {
         aplicarFiltros(); 
       }
     }
@@ -133,6 +144,8 @@ function iniciarConexaoNuvem() {
 // --- RENDERIZAÇÃO ---
 function renderizar(lista) {
   const container = document.getElementById('lista-produtos');
+  if(!container) return;
+  
   container.innerHTML = '';
 
   if (!lista || lista.length === 0) {
@@ -214,6 +227,8 @@ window.aplicarFiltros = function() {
   const inputBusca = document.getElementById('busca');
   const selectCategoria = document.getElementById('filtro-categoria');
   const checkFalta = document.getElementById('filtro-falta');
+
+  if(!inputBusca || !selectCategoria || !checkFalta) return;
 
   const termo = normalizarTexto(inputBusca.value);
   const categoriaSelecionada = selectCategoria.value.trim();
