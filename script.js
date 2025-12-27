@@ -30,14 +30,27 @@ function gerarId(nome) {
   return nome.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
+// --- NOVA FUNÇÃO: MÁSCARA DE DATA ---
+window.mascaraData = function(input) {
+  let v = input.value.replace(/\D/g, ""); // Remove tudo que não é número
+  
+  if (v.length > 2) {
+    v = v.replace(/^(\d{2})(\d)/, "$1/$2"); // Coloca a barra depois do 2º número
+  }
+  
+  if (v.length > 5) {
+    v = v.substring(0, 5); // Limita a 5 caracteres (dd/mm)
+  }
+  
+  input.value = v;
+};
+
 // --- INICIALIZAÇÃO ---
 window.onload = function() {
-  // 1. Configura os elementos da tela
   const inputBusca = document.getElementById('busca');
   const selectCategoria = document.getElementById('filtro-categoria');
   const checkFalta = document.getElementById('filtro-falta');
 
-  // 2. Garante que os eventos funcionem (Aqui estava o possível erro)
   if (inputBusca) {
     inputBusca.onkeyup = function() {
       clearTimeout(timeoutBusca);
@@ -47,7 +60,6 @@ window.onload = function() {
   if (selectCategoria) selectCategoria.onchange = aplicarFiltros;
   if (checkFalta) checkFalta.onchange = aplicarFiltros;
 
-  // 3. Carrega dados locais
   if (window.produtos) {
     listaGlobal = window.produtos.map(p => ({
       ...p,
@@ -58,7 +70,6 @@ window.onload = function() {
     document.getElementById('lista-produtos').innerHTML = "Erro: window.produtos não encontrado.";
   }
 
-  // 4. Conecta na Nuvem
   iniciarConexaoNuvem();
 };
 
@@ -80,7 +91,6 @@ function iniciarConexaoNuvem() {
         };
       });
       
-      // Só atualiza se o usuário não estiver digitando
       if (document.activeElement !== document.getElementById('busca')) {
         aplicarFiltros(); 
       }
@@ -94,7 +104,7 @@ function renderizar(lista) {
   container.innerHTML = '';
 
   if (!lista || lista.length === 0) {
-    container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">Nenhum produto encontrado nesta categoria.</div>';
+    container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">Nenhum produto encontrado.</div>';
     return;
   }
 
@@ -121,8 +131,9 @@ function renderizar(lista) {
       <div class="controles-estoque">
         <div class="input-group">
           <label>Data</label>
-          <input type="text" class="input-pequeno" placeholder="dd/mm" 
+          <input type="text" class="input-pequeno" placeholder="dd/mm" maxlength="5"
             value="${produto.data}" 
+            oninput="mascaraData(this)"
             onchange="salvarDado('${produto.nome}', 'data', this.value)">
         </div>
 
@@ -165,20 +176,18 @@ window.salvarFalta = function(nomeProduto, isChecked) {
   db.ref('estoque/' + id + '/falta').set(isChecked);
 };
 
-// --- FILTRO (A Lógica Corrigida) ---
+// --- FILTRO ---
 window.aplicarFiltros = function() {
   const inputBusca = document.getElementById('busca');
   const selectCategoria = document.getElementById('filtro-categoria');
   const checkFalta = document.getElementById('filtro-falta');
 
   const termo = normalizarTexto(inputBusca.value);
-  const categoriaSelecionada = selectCategoria.value.trim(); // Remove espaços extras
+  const categoriaSelecionada = selectCategoria.value.trim();
   const soFalta = checkFalta.checked;
 
   const filtrados = listaGlobal.filter(p => {
     const nomeNormalizado = normalizarTexto(p.nome);
-    
-    // Compara a categoria do arquivo com a selecionada (Ignora espaços)
     const categoriaProduto = p.categoria.trim();
     
     const matchNome = nomeNormalizado.includes(termo);
@@ -187,6 +196,3 @@ window.aplicarFiltros = function() {
     
     return matchNome && matchCat && matchFalta;
   });
-
-  renderizar(filtrados);
-};
