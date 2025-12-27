@@ -1,12 +1,12 @@
+// --- SISTEMA DE DIAGNÓSTICO DE ERROS ---
 window.onerror = function(message, source, lineno, colno, error) {
   const container = document.getElementById('lista-produtos');
   if (container) {
     container.innerHTML = `
-      <div style="background:red; color:white; padding:15px; border-radius:5px; margin: 20px;">
-        <h3>Ocorreu um erro!</h3>
-        <p><b>Mensagem:</b> ${message}</p>
-        <p><b>Linha:</b> ${lineno}</p>
-        <p>Tire um print e mande para corrigir.</p>
+      <div style="background:red; color:white; padding:15px; margin: 20px;">
+        <h3>Erro Crítico!</h3>
+        <p>${message}</p>
+        <p>Linha: ${lineno}</p>
       </div>
     `;
   }
@@ -31,7 +31,7 @@ try {
     firebase.initializeApp(firebaseConfig);
     window.db = firebase.database();
   } else {
-    console.warn("Firebase não carregado ainda.");
+    console.warn("Firebase não carregado.");
   }
 } catch (e) {
   console.error(e);
@@ -51,18 +51,15 @@ function gerarId(nome) {
   return nome.replace(/[^a-zA-Z0-9]/g, '_');
 }
 
-// --- MÁSCARA DE DATA (Função Global) ---
+// --- MÁSCARA DE DATA ---
 window.aplicarMascaraData = function(input) {
   let valor = input.value.replace(/\D/g, "");
-  
   if (valor.length > 2) {
     valor = valor.replace(/^(\d{2})(\d)/, "$1/$2");
   }
-  
   if (valor.length > 5) {
     valor = valor.substring(0, 5);
   }
-  
   input.value = valor;
 };
 
@@ -73,7 +70,7 @@ window.onload = function() {
   const checkFalta = document.getElementById('filtro-falta');
   const container = document.getElementById('lista-produtos');
 
-  // Configura Eventos de Filtro
+  // Eventos
   if (inputBusca) {
     inputBusca.onkeyup = function() {
       clearTimeout(timeoutBusca);
@@ -83,24 +80,23 @@ window.onload = function() {
   if (selectCategoria) selectCategoria.onchange = aplicarFiltros;
   if (checkFalta) checkFalta.onchange = aplicarFiltros;
 
-  // Carrega Lista Local
-  if (window.produtos && window.produtos.length > 0) {
+  // Carrega Local
+  if (window.produtos) {
     listaGlobal = window.produtos.map(p => ({
-      ...p,
-      falta: false, data: "", qtdAtual: "", qtdRepor: ""
+      ...p, falta: false, data: "", qtdAtual: "", qtdRepor: ""
     }));
     renderizar(listaGlobal);
   } else {
-    if(container) container.innerHTML = "<div style='padding:20px; text-align:center'>Erro: Lista de produtos vazia ou não encontrada no arquivo produtos.js</div>";
+    if(container) container.innerHTML = "Erro: window.produtos não encontrado.";
   }
 
-  // Conecta na Nuvem
+  // Conecta Nuvem
   iniciarConexaoNuvem();
 };
 
 function iniciarConexaoNuvem() {
   if (!window.db) return;
-
+  
   window.db.ref('estoque').on('value', (snapshot) => {
     const dadosNuvem = snapshot.val() || {};
     
@@ -108,7 +104,6 @@ function iniciarConexaoNuvem() {
       listaGlobal = window.produtos.map(pArquivo => {
         const id = gerarId(pArquivo.nome);
         const pSalvo = dadosNuvem[id] || {};
-
         return {
           ...pArquivo,
           falta: pSalvo.falta || false,
@@ -118,24 +113,21 @@ function iniciarConexaoNuvem() {
         };
       });
       
-      // Só atualiza se não estiver buscando/digitando
-      const buscaElem = document.getElementById('busca');
-      if (document.activeElement !== buscaElem) {
+      const busca = document.getElementById('busca');
+      if (document.activeElement !== busca) {
         aplicarFiltros(); 
       }
     }
   });
 }
 
-// --- RENDERIZAÇÃO ---
 function renderizar(lista) {
   const container = document.getElementById('lista-produtos');
-  if(!container) return;
-  
+  if (!container) return;
   container.innerHTML = '';
 
   if (!lista || lista.length === 0) {
-    container.innerHTML = '<div style="padding:20px; text-align:center; color:#666;">Nenhum produto encontrado.</div>';
+    container.innerHTML = '<div style="padding:20px; text-align:center;">Nenhum produto encontrado.</div>';
     return;
   }
 
@@ -145,7 +137,6 @@ function renderizar(lista) {
     const div = document.createElement('div');
     div.className = 'produto';
     
-    // Estilo Falta
     if (produto.falta) {
       div.style.borderLeftColor = "red";
       div.style.backgroundColor = "#fff5f5";
@@ -197,7 +188,6 @@ function renderizar(lista) {
   container.appendChild(fragmento);
 }
 
-// --- SALVAMENTO ---
 window.salvarDado = function(nomeProduto, campo, valor) {
   const id = gerarId(nomeProduto);
   if(window.db) window.db.ref('estoque/' + id + '/' + campo).set(valor);
@@ -208,24 +198,23 @@ window.salvarFalta = function(nomeProduto, isChecked) {
   if(window.db) window.db.ref('estoque/' + id + '/falta').set(isChecked);
 };
 
-// --- FILTRO ---
 window.aplicarFiltros = function() {
   const inputBusca = document.getElementById('busca');
   const selectCategoria = document.getElementById('filtro-categoria');
   const checkFalta = document.getElementById('filtro-falta');
-
-  if(!inputBusca || !selectCategoria || !checkFalta) return;
+  
+  if (!inputBusca) return;
 
   const termo = normalizarTexto(inputBusca.value);
-  const categoriaSelecionada = selectCategoria.value.trim();
+  const categoria = selectCategoria.value.trim();
   const soFalta = checkFalta.checked;
 
   const filtrados = listaGlobal.filter(p => {
-    const nomeNormalizado = normalizarTexto(p.nome);
-    const categoriaProduto = p.categoria.trim();
+    const nomeNorm = normalizarTexto(p.nome);
+    const catNorm = p.categoria.trim();
     
-    const matchNome = nomeNormalizado.includes(termo);
-    const matchCat = categoriaSelecionada === "" || categoriaProduto === categoriaSelecionada;
+    const matchNome = nomeNorm.includes(termo);
+    const matchCat = categoria === "" || catNorm === categoria;
     const matchFalta = !soFalta || (soFalta && p.falta);
     
     return matchNome && matchCat && matchFalta;
@@ -233,4 +222,3 @@ window.aplicarFiltros = function() {
 
   renderizar(filtrados);
 };
-
