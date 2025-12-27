@@ -1,17 +1,3 @@
-Baseado no seu print (Uncaught SyntaxError: Unexpected end of input), o erro é simples: o código ficou incompleto na hora de copiar ou salvar.
-
-Esse erro significa literalmente: "O navegador estava lendo o código e o arquivo acabou do nada, sendo que eu esperava um fechamento de chave } ou parênteses )".
-
-Isso geralmente acontece quando falta copiar a última linha do arquivo.
-
-Como resolver agora
-Vou te mandar o código completo do script.js novamente. Copie TUDO, até a última chave lá embaixo. Substitua o arquivo inteiro.
-
-Arquivo script.js Corrigido:
-
-JavaScript
-
-// --- SISTEMA DE DIAGNÓSTICO DE ERROS (PARA MOBILE) ---
 window.onerror = function(message, source, lineno, colno, error) {
   const container = document.getElementById('lista-produtos');
   if (container) {
@@ -247,3 +233,4 @@ window.aplicarFiltros = function() {
 
   renderizar(filtrados);
 };
+
