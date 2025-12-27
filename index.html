@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestor de Estoque</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Controle de Estoque</h1>
+
+  <div class="topo">
+    <input
+      type="text"
+      id="busca"
+      placeholder="Buscar produto..."
+      onkeyup="aplicarFiltros()"
+    >
+
+    <select id="filtro-categoria" onchange="aplicarFiltros()">
+      <option value="">Todas categorias</option>
+      <option value="Refrigerante">Refrigerante</option>
+      <option value="Cerveja">Cerveja</option>
+      <option value="Destilado">Destilado</option>
+      <option value="Ice/Gin">Ice/Gin</option>
+      <option value="Mercearia">Mercearia</option>
+      <option value="Carne">Carne</option>
+      <option value="Limpeza">Limpeza</option>
+    </select>
+
+    <label class="filtro">
+      <input
+        type="checkbox"
+        id="filtro-falta"
+        onchange="aplicarFiltros()"
+      >
+      Mostrar só o que falta
+    </label>
+  </div>
+
+  <div id="lista-produtos"></div>
+ <script src="produtos.js"></script>
+  <script type="module" src="script.js"></script> 
+</body>
+</html>

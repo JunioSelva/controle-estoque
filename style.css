@@ -1,0 +1,88 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  padding: 20px;
+}
+
+h1 { text-align: center; margin-bottom: 20px; }
+
+.topo {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#busca { flex: 1; padding: 8px; min-width: 200px; }
+.filtro { display: flex; align-items: center; gap: 5px; font-size: 14px; }
+
+#lista-produtos { display: flex; flex-direction: column; gap: 8px; }
+
+.produto {
+  background: #fff;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  border-radius: 4px;
+  border-left: 5px solid transparent;
+  flex-wrap: wrap;
+}
+
+.info-principal {
+  flex: 1;
+  min-width: 150px;
+}
+
+.nome { font-weight: bold; display: block; }
+.categoria { font-size: 12px; color: #888; }
+
+/* Área dos inputs separados */
+.controles-estoque {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  font-size: 10px;
+  color: #666;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.input-pequeno {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 80px; /* Largura fixa para ficar alinhado */
+  font-size: 13px;
+}
+
+.falta-label {
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .controles-estoque {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 5px;
+    order: 3;
+  }
+  .input-pequeno { width: 100%; } /* No celular estica */
+  .input-group { flex: 1; }
+}
