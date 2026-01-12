@@ -13,7 +13,6 @@ window.onerror = function(message, source, lineno, colno, error) {
   return false;
 };
 
-// --- CONFIGURAÇÃO FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyBgBx-f_4FN7_nxbG4MGiBqEsZJwF8nJco",
   authDomain: "estoquebardonino.firebaseapp.com",
@@ -25,7 +24,6 @@ const firebaseConfig = {
   measurementId: "G-6RPN2ML4FB"
 };
 
-// Inicializa Firebase
 try {
   if (typeof firebase !== 'undefined') {
     firebase.initializeApp(firebaseConfig);
@@ -37,11 +35,9 @@ try {
   console.error(e);
 }
 
-// Variáveis Globais
 let listaGlobal = [];
 let timeoutBusca = null;
 
-// --- FUNÇÕES DE AJUDA ---
 function normalizarTexto(texto) {
   if (!texto) return "";
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
@@ -62,9 +58,6 @@ window.aplicarMascaraData = function(input) {
   input.value = valor;
 };
 
-// --- FUNÇÕES PRINCIPAIS (AGORA DEFINIDAS ANTES DO USO) ---
-
-// 1. Renderizar
 function renderizar(lista) {
   const container = document.getElementById('lista-produtos');
   if(!container) return;
@@ -82,7 +75,6 @@ function renderizar(lista) {
     const div = document.createElement('div');
     div.className = 'produto';
     
-    // ID Seguro
     const idSeguro = gerarId(produto.nome);
 
     if (produto.falta) {
@@ -153,7 +145,6 @@ window.salvarFalta = function(idProduto, isChecked) {
   }
 };
 
-// 3. Filtrar
 window.aplicarFiltros = function() {
   const inputBusca = document.getElementById('busca');
   const selectCategoria = document.getElementById('filtro-categoria');
@@ -207,7 +198,6 @@ function iniciarConexaoNuvem() {
   });
 }
 
-// --- INICIALIZAÇÃO (MOVIDO PARA O FINAL) ---
 window.onload = function() {
   console.log("SISTEMA CARREGADO - V6 ORDENADA");
   
@@ -216,7 +206,6 @@ window.onload = function() {
   const checkFalta = document.getElementById('filtro-falta');
   const container = document.getElementById('lista-produtos');
 
-  // Agora as funções JÁ EXISTEM, então podemos usá-las
   if (inputBusca) {
     inputBusca.onkeyup = function() {
       clearTimeout(timeoutBusca);
@@ -231,7 +220,7 @@ window.onload = function() {
       ...p,
       falta: false, data: "", qtdAtual: "", qtdRepor: ""
     }));
-    // Renderiza a primeira vez
+
     renderizar(listaGlobal);
   } else {
     if(container) container.innerHTML = "<div style='padding:20px; text-align:center'>Erro: Lista vazia.</div>";
@@ -239,3 +228,4 @@ window.onload = function() {
 
   iniciarConexaoNuvem();
 };
+
