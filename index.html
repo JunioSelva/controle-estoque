@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Estoque</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Estoque</title>
 
-  <link rel="stylesheet" href="style.css?v=CARDS_2000">
+  <link rel="stylesheet" href="style.css?v=NOVO_LAYOUT_2000" />
 </head>
 <body>
 
-  <header class="cabecalho">
-    <h1>Controle de Estoque</h1>
-    <p class="subtitulo">Consulte e atualize os itens de forma simples</p>
-  </header>
+  <h1>Controle de Estoque</h1>
 
-  <section class="topo">
+  <div class="topo">
     <input
       type="text"
       id="busca"
       placeholder="Buscar item..."
-      autocomplete="off"
-    >
+    />
 
     <select id="filtro-categoria">
       <option value="">Todas categorias</option>
@@ -32,18 +28,58 @@
       <option value="Carne">Carne</option>
       <option value="Limpeza">Limpeza</option>
     </select>
-  </section>
 
-  <main>
-    <div id="lista-produtos">
-      Carregando sistema...
+    <label class="filtro">
+      <input
+        type="checkbox"
+        id="filtro-falta"
+      />
+      Mostrar só o que falta
+    </label>
+  </div>
+
+  <div id="lista-produtos">
+    <!-- EXEMPLO VISUAL DE CARD -->
+    <div class="produto">
+      <div class="info-principal">
+        <span class="nome">Produto Exemplo</span>
+        <span class="categoria">Categoria</span>
+      </div>
+
+      <div class="controles-estoque">
+        <div class="input-group">
+          <label for="data-exemplo">Data</label>
+          <input
+            type="date"
+            id="data-exemplo"
+            class="input-data"
+          />
+        </div>
+
+        <div class="input-group quantidade-box">
+          <label for="qtd-exemplo">Quantidade</label>
+          <div class="quantidade-controle">
+            <button type="button" class="btn-qtd menos">-</button>
+
+            <input
+              type="number"
+              id="qtd-exemplo"
+              class="input-pequeno"
+              value="0"
+              min="0"
+            />
+
+            <button type="button" class="btn-qtd mais">+</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </main>
+  </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-  <script src="produtos.js?v=CARDS_2000"></script>
-  <script src="script.js?v=CARDS_2000"></script>
+  <script src="produtos.js?v=NOVO_LAYOUT_2000"></script>
+  <script src="script.js?v=NOVO_LAYOUT_2000"></script>
 </body>
 </html>
