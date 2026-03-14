@@ -228,4 +228,3 @@ window.onload = function() {
 
   iniciarConexaoNuvem();
 };
-
