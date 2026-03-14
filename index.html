@@ -3,19 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestor de Estoque</title>
-  
-  <link rel="stylesheet" href="style.css?v=AGORA_VAI_1000">
+  <title>Controle de Estoque</title>
+
+  <link rel="stylesheet" href="style.css?v=CARDS_2000">
 </head>
 <body>
 
-  <h1>Controle de Estoque</h1>
+  <header class="cabecalho">
+    <h1>Controle de Estoque</h1>
+    <p class="subtitulo">Consulte e atualize os itens de forma simples</p>
+  </header>
 
-  <div class="topo">
+  <section class="topo">
     <input
       type="text"
       id="busca"
-      placeholder="Buscar produto..."
+      placeholder="Buscar item..."
+      autocomplete="off"
     >
 
     <select id="filtro-categoria">
@@ -28,23 +32,18 @@
       <option value="Carne">Carne</option>
       <option value="Limpeza">Limpeza</option>
     </select>
+  </section>
 
-    <label class="filtro">
-      <input
-        type="checkbox"
-        id="filtro-falta"
-      >
-      Mostrar só o que falta
-    </label>
-  </div>
-
-  <div id="lista-produtos">Carregando sistema...</div>
+  <main>
+    <div id="lista-produtos">
+      Carregando sistema...
+    </div>
+  </main>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-  <script src="produtos.js?v=NEON_FINAL"></script>
-  <script src="script.js?v=NEON_FINAL"></script>
+  <script src="produtos.js?v=CARDS_2000"></script>
+  <script src="script.js?v=CARDS_2000"></script>
 </body>
 </html>
-
