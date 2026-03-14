@@ -109,7 +109,6 @@ select:focus {
   cursor: pointer;
 }
 
-/* GRID DE CARDS */
 #lista-produtos {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -119,7 +118,6 @@ select:focus {
   align-items: stretch;
 }
 
-/* CARD */
 .produto {
   background: white;
   padding: 16px;
@@ -130,7 +128,7 @@ select:focus {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   border: 2px solid transparent;
-  min-height: 270px;
+  min-height: 220px;
   position: relative;
 }
 
@@ -141,31 +139,6 @@ select:focus {
   z-index: 5;
 }
 
-@keyframes pulsoAlerta {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.5);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(255, 71, 87, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 71, 87, 0);
-  }
-}
-
-.produto[style*="rgb(255, 245, 245)"] {
-  border: 2px solid #ff4757 !important;
-  background: #fff5f5 !important;
-  animation: pulsoAlerta 2s infinite;
-}
-
-.produto[style*="rgb(255, 245, 245)"]:hover {
-  border-color: #cc0000 !important;
-  box-shadow: 0 0 15px rgba(204, 0, 0, 0.2) !important;
-  animation: none;
-}
-
-/* TOPO DO CARD */
 .info-principal {
   display: flex;
   flex-direction: column;
@@ -194,15 +167,13 @@ select:focus {
   letter-spacing: 0.4px;
 }
 
-/* ÁREA DE CONTROLES */
 .controles-estoque {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 12px;
   margin-top: auto;
 }
 
-/* BLOCOS INTERNOS */
 .input-group {
   background: #f8fafb;
   border: 1px solid #e9edf2;
@@ -211,7 +182,6 @@ select:focus {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 92px;
 }
 
 .input-group label {
@@ -223,8 +193,8 @@ select:focus {
   text-align: center;
 }
 
-/* CAMPO DE QUANTIDADE */
-.input-pequeno {
+.input-pequeno,
+.input-data {
   width: 100%;
   height: 42px;
   padding: 8px 10px;
@@ -238,13 +208,13 @@ select:focus {
   transition: all 0.2s ease;
 }
 
-.input-pequeno:focus {
+.input-pequeno:focus,
+.input-data:focus {
   background: #fff;
   border-color: #39ff14;
   box-shadow: 0 0 0 4px rgba(57, 255, 20, 0.12);
 }
 
-/* PREPARO PARA BOTÕES DE QUANTIDADE */
 .quantidade-box {
   display: flex;
   flex-direction: column;
@@ -257,9 +227,13 @@ select:focus {
   gap: 8px;
 }
 
+.quantidade-controle .input-pequeno {
+  flex: 1;
+}
+
 .btn-qtd {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border: none;
   border-radius: 10px;
   background: #eef2f5;
@@ -298,73 +272,12 @@ select:focus {
   background: #ffe0e0;
 }
 
-/* BLOCO DE STATUS / FALTA */
-.falta-wrapper {
-  grid-column: 1 / -1;
-  background: #f8fafb;
-  border: 1px solid #e9edf2;
-  border-radius: 14px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.falta-texto {
-  font-size: 13px;
-  font-weight: 700;
-  color: #55606d;
-}
-
-.falta-label {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 0;
-}
-
-.falta-label input[type="checkbox"] {
-  appearance: none;
-  width: 46px;
-  height: 26px;
-  background: #dcdde1;
-  border-radius: 20px;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.3s;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.falta-label input[type="checkbox"]::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.3s cubic-bezier(0.3, 1.5, 0.7, 1);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.falta-label input[type="checkbox"]:checked {
-  background: #ff4757;
-}
-
-.falta-label input[type="checkbox"]:checked::after {
-  transform: translateX(20px);
-}
-
-/* TABLET GRANDE / NOTEBOOK */
 @media (max-width: 1200px) {
   #lista-produtos {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-/* TABLET */
 @media (max-width: 900px) {
   body {
     padding: 15px;
@@ -373,13 +286,8 @@ select:focus {
   #lista-produtos {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .produto {
-    min-height: 250px;
-  }
 }
 
-/* CELULAR */
 @media (max-width: 600px) {
   body {
     padding: 10px;
@@ -431,7 +339,6 @@ select:focus {
   }
 
   .input-group {
-    min-height: auto;
     padding: 10px;
   }
 
@@ -439,7 +346,8 @@ select:focus {
     font-size: 10px;
   }
 
-  .input-pequeno {
+  .input-pequeno,
+  .input-data {
     height: 40px;
     font-size: 14px;
   }
@@ -452,27 +360,5 @@ select:focus {
     width: 36px;
     height: 36px;
     font-size: 18px;
-  }
-
-  .falta-wrapper {
-    padding: 10px;
-  }
-
-  .falta-texto {
-    font-size: 12px;
-  }
-
-  .falta-label input[type="checkbox"] {
-    width: 42px;
-    height: 24px;
-  }
-
-  .falta-label input[type="checkbox"]::after {
-    width: 18px;
-    height: 18px;
-  }
-
-  .falta-label input[type="checkbox"]:checked::after {
-    transform: translateX(18px);
   }
 }
